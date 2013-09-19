@@ -18,34 +18,15 @@ GLfloat t3 = 3.0/4.0;
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
+bool rightClicked;
+
 //two walls: one has 1 segment the other has 7 segments
-GLuint buffers[16];
+GLuint squareBuffers[16];
 GLuint vPosition;
-
-//wall segment 0
-point4 cell0[4] = {
-    point4( 0.0, 0.0,  0.0, 1.0 ),
-    point4( 0.0, t1,  0.0, 1.0 ),
-	point4(t1, t1, 0.0, 1.0),
-	point4(t1, 0.0, 0.0, 1.0),
-	point4(0.0, 0.0, 0.0, 1.0)
-};
-
-//wall segment 1
-point4 points1[8] = {
-    point4(  t2,  t1, 0.0, 1.0),
-    point4( 0.0,  t1, 0.0, 1.0), 
-	point4( 0.0, 1.0, 0.0, 1.0), 
-	point4( 1.0, 1.0, 0.0, 1.0), 
-	point4( 1.0,  t2, 0.0, 1.0), 
-	point4(  t1,  t2, 0.0, 1.0), 
-	point4( 1.0,  t2, 0.0, 1.0), 
-	point4( 1.0,  t1, 0.0, 1.0) 
-};
-
+GLuint numSquares = 0;
 
 // RGBA colors
-color4 blue_opaque = color4( 0.0, 0.0, 1.0, 1.0 );
+color4 lineColor = color4( 1.0, 0.0, 0.0, 1.0 );
 
 //uniform variable locations
 GLuint color_loc;
@@ -53,7 +34,32 @@ GLuint model_view_loc;
 
 mat4 ctmat = Angel::mat4(1.0);
 
+//---------------------------------------------------------------------------
+void drawSquares(GLfloat x0, GLfloat y0, GLfloat x1, GLfloat y1, GLint xlimit, GLint ylimit)
+{
+	glGenBuffers(16, &squareBuffers[0]);
+	//creates square cells
+	GLfloat width = (x1-x0)/xlimit;
+	GLfloat height = (y1-y0)/ylimit;
+	GLint x, y;
+	for(y = 0; y < ylimit; y++) {
+		for (x = 0; x < xlimit; x++) {
+			point4 square[5] = {
+				point4(x0 + (x * width), y0 + (y * height), 0.0, 1.0),
+				point4(x0 + (x * width), y0 + ((y+1) * height), 0.0, 1.0),
+				point4(x0 + ((x+1) * width), y0 + ((y+1) * height), 0.0, 1.0),
+				point4(x0 + ((x+1) * width), y0 + (y * height), 0.0, 1.0),
+				point4(x0 + (x * width), y0 + (y * height), 0.0, 1.0)
+			};
 
+
+			glBindBuffer( GL_ARRAY_BUFFER, squareBuffers[numSquares] );
+			glBufferData( GL_ARRAY_BUFFER, sizeof(square),  square, GL_STATIC_DRAW );
+
+			numSquares++;
+		}
+	}
+}
 
 //----------------------------------------------------------------------------
 
@@ -62,17 +68,11 @@ void
 init()
 {
 	
+	numSquares = 0;
 
+	drawSquares(-1, -1, 1, 1, 4, 4);
 
     // Create and initialize a buffer object
-    
-    glGenBuffers( 2, &buffers[0] );
-	
-    glBindBuffer( GL_ARRAY_BUFFER, buffers[0] );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(points0),  points0, GL_STATIC_DRAW );
-
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[1] );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(points1),  points1, GL_STATIC_DRAW );
 
    // Load shaders and use the resulting shader program
     GLuint program = InitShader( "vshader00_v110.glsl", "fshader00_v110.glsl" );
@@ -88,7 +88,7 @@ init()
 	model_view_loc = glGetUniformLocation(program, "modelview");
 
     glEnable( GL_DEPTH_TEST );
-    glClearColor( 1.0, 1.0, 0.0, 1.0 ); 
+    glClearColor( 1.0, 1.0, 1.0, 1.0 ); 
 }
 
 //----------------------------------------------------------------------------
@@ -99,48 +99,22 @@ display1( void )
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-
-	glUniform4fv(color_loc, 1, blue_opaque);
+	glUniform4fv(color_loc, 1, lineColor);
 	
 	ctmat = Angel::mat4(1.0);
 
 	glUniformMatrix4fv(model_view_loc, 1, GL_TRUE, ctmat);
 
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[1] );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
-	glDrawArrays( GL_LINE_STRIP, 0, 8);
-
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[0] );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
-	glDrawArrays( GL_LINES, 0, 2 );
+	for(numSquares = 0; numSquares < 16; numSquares++) {
+		glBindBuffer( GL_ARRAY_BUFFER, squareBuffers[numSquares] );
+		glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+		glDrawArrays( GL_LINE_STRIP, 0, 5);
+	};
 	
 	glFlush();
 }
 
-void
-display2( void )
-{
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-
-	glUniform4fv(color_loc, 1, blue_opaque);
-	
-	ctmat = Angel::mat4(1.0);
-
-	ctmat = ctmat*Angel::Scale(0.5, 0.5, 1);
-
-	glUniformMatrix4fv(model_view_loc, 1, GL_TRUE, ctmat);
-
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[1] );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
-	glDrawArrays( GL_LINE_STRIP, 0, 8);
-
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[0] );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
-	glDrawArrays( GL_LINES, 0, 2 );
-	
-	glFlush();
-}
 
 //----------------------------------------------------------------------------
 
@@ -157,6 +131,34 @@ keyboard( unsigned char key, int x, int y )
 
 //----------------------------------------------------------------------------
 
+void
+mouse(int button, int state, int x, int y)
+{
+	GLuint xLoc = -1;
+	GLuint yLoc = -1;
+
+	if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
+		xLoc = x;
+		yLoc = y;
+		rightClicked = true;
+		std::cout<<x<<"\n";
+		std::cout<<y<<"\n";
+	}
+
+	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && rightClicked == true){
+		xLoc = x;
+		yLoc = y;
+		rightClicked = false;
+	}
+
+	if(state == GLUT_UP)
+	{
+		xLoc = -1;
+		yLoc = -1;
+	}
+}
+//----------------------------------------------------------------------------
+
 int
 main( int argc, char **argv )
 {
@@ -170,13 +172,7 @@ main( int argc, char **argv )
 	init();
 	glutDisplayFunc( display1 );
     glutKeyboardFunc( keyboard );
-
-	int scaled = glutCreateWindow( "CS 537 The Labyrinth Scaled to Fit" );
-	glutInitWindowPosition(250, 350);
-	m_glewInitAndVersion();
-	init();
-	glutDisplayFunc( display2 );
-    glutKeyboardFunc( keyboard );
+	glutMouseFunc( mouse );
 
     glutMainLoop();
     return 0;
