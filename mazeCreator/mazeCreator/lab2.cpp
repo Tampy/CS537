@@ -15,6 +15,9 @@ GLfloat t1 = 1.0/4.0;
 GLfloat t2 = 2.0/4.0;
 GLfloat t3 = 3.0/4.0;
 
+GLuint randomNum;
+GLuint randomNum2;
+
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
@@ -31,7 +34,7 @@ GLfloat pick[2];
 
 // RGBA colors
 color4 lineColor = color4( 1.0, 0.0, 0.0, 1.0 );
-color4 clearColor = color4(1.0,1.0,1.0,1.0);
+color4 clearColor = color4(0.0,1.0,1.0,1.0);
 
 //uniform variable locations
 GLuint color_loc;
@@ -68,15 +71,18 @@ void drawSquares(GLfloat x0, GLfloat y0, GLfloat x1, GLfloat y1, GLint xlimit, G
 
 //----------------------------------------------------------------------------
 
-void exitMaker(GLint randomNum, GLint randomNum2)
+void exitMaker()
 {
 	GLfloat xDisappear;
 	GLfloat yDisappear;
 	
 	glGenBuffers(1, &disappearBuffer[0]);
-	glGenBuffers(1, &colorBuffer[0]);
 
-	if(randomNum = 0)
+
+	randomNum = rand() % 4;
+	randomNum2 = (rand() % 4)/4.0;
+
+	if(randomNum == 0)
 	{
 		point4 disappear[2] = {
 			point4(0.0, randomNum2, 0.0, 1.0),
@@ -86,7 +92,7 @@ void exitMaker(GLint randomNum, GLint randomNum2)
 		glBindBuffer( GL_ARRAY_BUFFER, disappearBuffer[0] );
 		glBufferData( GL_ARRAY_BUFFER, sizeof(disappear),  disappear, GL_STATIC_DRAW );
 	}
-	else if(randomNum = 1)
+	else if(randomNum == 1)
 	{
 		point4 disappear[2] = {
 			point4(1.0, randomNum2, 0.0, 1.0),
@@ -96,7 +102,7 @@ void exitMaker(GLint randomNum, GLint randomNum2)
 		glBindBuffer( GL_ARRAY_BUFFER, disappearBuffer[0] );
 		glBufferData( GL_ARRAY_BUFFER, sizeof(disappear),  disappear, GL_STATIC_DRAW );
 	}
-	else if(randomNum = 2)
+	else if(randomNum == 2)
 	{
 		point4 disappear[2] = {
 			point4(randomNum2, 0.0, 0.0, 1.0),
@@ -106,7 +112,7 @@ void exitMaker(GLint randomNum, GLint randomNum2)
 		glBindBuffer( GL_ARRAY_BUFFER, disappearBuffer[0] );
 		glBufferData( GL_ARRAY_BUFFER, sizeof(disappear),  disappear, GL_STATIC_DRAW );
 	}
-	else if (randomNum = 3)
+	else if (randomNum == 3)
 	{
 		point4 disappear[2] = {
 			point4(randomNum2, 1.0, 0.0, 1.0),
@@ -128,14 +134,11 @@ init()
 {
 	srand(time(NULL));
 
-	GLint randomNum = rand() % 4;
-	GLint randomNum2 = (rand() % 4)/4.0;
-
 	numSquares = 0;
 
-	drawSquares(-0.5, -0.5, 1, 1, 4, 4);
+	drawSquares(0, 0, 1, 1, 4, 4);
 
-	exitMaker(randomNum, randomNum2);
+	exitMaker();
 
     // Create and initialize a buffer object
 

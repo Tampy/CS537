@@ -15,16 +15,22 @@ GLfloat t1 = 1.0/4.0;
 GLfloat t2 = 2.0/4.0;
 GLfloat t3 = 3.0/4.0;
 
+int randomExit1;
+int randomExit2;
+
+/*
 GLfloat chooseExit1 = (rand() % 3)/4.0;
 GLfloat chooseExit2 = (rand() % 3)/4.0;
-
+*/
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
 //several inner walls
 GLuint buffers[9];
+GLuint exitBuffer[16];
 GLuint vPosition;
 
+/*
 //wall 0
 point4 wall0[2] = {
 	point4(0.0, 0.0, 0.0, 1.0),
@@ -45,7 +51,7 @@ point4 wall2[3] = {
 	point4(1.0,0.0,0.0,1.0),
 	point4(0.0,0.0,0.0,1.0)
 };
-
+*/
 //line segment 0
 point4 points0[2] = {
     point4(0.0, t2,  0.0, 1.0 ),
@@ -95,7 +101,92 @@ GLuint model_view_loc;
 mat4 ctmat = Angel::mat4(1.0);
 
 
+//----------------------------------------------------------------------------
 
+void makeExit()
+{
+	GLuint endLoop = 0;
+	GLfloat x1, y1, x2, y2;
+	x1 = 0.0;
+	y1 = 0.0;
+	x2 = 0.0;
+	y2 = t1;
+
+	glGenBuffers( 16, &exitBuffer[0] );
+
+	randomExit1 = rand() % 16;
+	randomExit2 = rand() % 16;
+
+	while(randomExit1 == randomExit2)
+		randomExit2 = rand() % 16;
+	for(int i=0;i<16;i++)
+	{
+		if(i != randomExit1 && i != randomExit2)
+		{
+			point4 exitWalls[2] = {
+				point4(x1, y1, 0.0, 1.0),
+				point4(x2, y2, 0.0, 1.0)
+			};
+			
+			glBindBuffer( GL_ARRAY_BUFFER, exitBuffer[i] );
+			glBufferData( GL_ARRAY_BUFFER, sizeof(exitWalls),  exitWalls, GL_STATIC_DRAW );
+		}
+		if(x1 == 0.0 && x2 == 0.0 && endLoop != 1)
+		{
+			if(y2 != 1.0)
+			{
+				y1 = y2;
+				y2 = y2 + t1;
+			}
+			else if(y2 == 1.0)
+			{
+				y1 = y2;
+				x2 = x2 + t1;
+			}
+		}
+		else if(y1 == 1.0 && y2 == 1.0)
+		{
+			if(x2 != 1.0)
+			{
+				x1 = x2;
+				x2 = x2 + t1;
+			}
+			else if(x2 == 1.0)
+			{
+				x1 = x2;
+				y2 = y2 - t1;
+			}
+		}
+		else if(x1 == 1.0 && x2 == 1.0)
+		{
+			if(y2 != 0.0)
+			{
+				y1 = y2;
+				y2 = y2 - t1;
+			}
+			else if(y2 == 0.0)
+			{
+				y1 = y2;
+				x2 = x2 - t1;
+			}
+		}
+		else if(y1 == 0.0 && y2 == 0.0)
+		{
+			if(x2 != 0.0)
+			{
+				x1 = x2;
+				x2 = x2 - t1;
+			}
+			else if(x2 == 0.0)
+			{
+				x1 = x2;
+				x2 = x2 - t1;
+				endLoop = 1;
+			}
+		}
+	}
+}
+				
 //----------------------------------------------------------------------------
 
 // OpenGL initialization
@@ -103,7 +194,7 @@ void
 init()
 {
 	
-
+	makeExit();
 
     // Create and initialize a buffer object
     
@@ -127,15 +218,6 @@ init()
 	glBindBuffer( GL_ARRAY_BUFFER, buffers[5] );
     glBufferData( GL_ARRAY_BUFFER, sizeof(points5),  points5, GL_STATIC_DRAW );
 
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[6] );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(wall0),  wall0, GL_STATIC_DRAW );
-
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[7] );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(wall1),  wall1, GL_STATIC_DRAW );
-
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[8] );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(wall2),  wall2, GL_STATIC_DRAW );
-
    // Load shaders and use the resulting shader program
     GLuint program = InitShader( "vshader00_v110.glsl", "fshader00_v110.glsl" );
     glUseProgram( program );
@@ -150,7 +232,7 @@ init()
 	model_view_loc = glGetUniformLocation(program, "modelview");
 
     glEnable( GL_DEPTH_TEST );
-    glClearColor( 1.0, 1.0, 0.0, 1.0 ); 
+    glClearColor( 1.0, 1.0, 1.0, 1.0 ); 
 }
 
 //----------------------------------------------------------------------------
@@ -168,17 +250,15 @@ display1( void )
 
 	glUniformMatrix4fv(model_view_loc, 1, GL_TRUE, ctmat);
 
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[8] );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
-	glDrawArrays( GL_LINE_STRIP, 0, 3);
-
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[7] );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
-	glDrawArrays( GL_LINE_STRIP, 0, 4);
-	
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[6] );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
-	glDrawArrays( GL_LINE_STRIP, 0, 2);
+	for(int i = 0; i<16;i++)
+	{
+		if(i != randomExit1 && i != randomExit2)
+		{
+			glBindBuffer( GL_ARRAY_BUFFER, exitBuffer[i] );
+			glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+			glDrawArrays( GL_LINE_STRIP, 0, 2);
+		}
+	}
 
 	glBindBuffer( GL_ARRAY_BUFFER, buffers[5] );
 	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
@@ -223,14 +303,14 @@ keyboard( unsigned char key, int x, int y )
 //----------------------------------------------------------------------------
 
 int
-main( int argc, char **argv )
+main( int argc, char **argv )	
 {
 	srand(time(NULL));
     glutInit( &argc, argv );
     glutInitDisplayMode( GLUT_RGBA | GLUT_SINGLE);
     glutInitWindowSize( 256, 256 );
 
-    int noscaled = glutCreateWindow( "CS 537 Homework 1 Question 1" );
+    int noscaled = glutCreateWindow( "CS 537 Homework 1 Question 3" );
 	glutInitWindowPosition(50, 50);
 	m_glewInitAndVersion();
 	init();
