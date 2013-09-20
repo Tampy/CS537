@@ -22,11 +22,16 @@ bool rightClicked;
 
 //two walls: one has 1 segment the other has 7 segments
 GLuint squareBuffers[16];
+GLuint disappearBuffer[1];
+GLuint colorBuffer[1];
 GLuint vPosition;
 GLuint numSquares = 0;
 
+GLfloat pick[2];
+
 // RGBA colors
 color4 lineColor = color4( 1.0, 0.0, 0.0, 1.0 );
+color4 clearColor = color4(1.0,1.0,1.0,1.0);
 
 //uniform variable locations
 GLuint color_loc;
@@ -63,14 +68,74 @@ void drawSquares(GLfloat x0, GLfloat y0, GLfloat x1, GLfloat y1, GLint xlimit, G
 
 //----------------------------------------------------------------------------
 
+void exitMaker(GLint randomNum, GLint randomNum2)
+{
+	GLfloat xDisappear;
+	GLfloat yDisappear;
+	
+	glGenBuffers(1, &disappearBuffer[0]);
+	glGenBuffers(1, &colorBuffer[0]);
+
+	if(randomNum = 0)
+	{
+		point4 disappear[2] = {
+			point4(0.0, randomNum2, 0.0, 1.0),
+			point4(0.0, randomNum2 + t1, 0.0, 1.0)
+		};
+
+		glBindBuffer( GL_ARRAY_BUFFER, disappearBuffer[0] );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(disappear),  disappear, GL_STATIC_DRAW );
+	}
+	else if(randomNum = 1)
+	{
+		point4 disappear[2] = {
+			point4(1.0, randomNum2, 0.0, 1.0),
+			point4(1.0, randomNum2 + t1, 0.0, 1.0)
+		};
+
+		glBindBuffer( GL_ARRAY_BUFFER, disappearBuffer[0] );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(disappear),  disappear, GL_STATIC_DRAW );
+	}
+	else if(randomNum = 2)
+	{
+		point4 disappear[2] = {
+			point4(randomNum2, 0.0, 0.0, 1.0),
+			point4(randomNum2 + t1, 0.0, 0.0, 1.0)
+		};
+
+		glBindBuffer( GL_ARRAY_BUFFER, disappearBuffer[0] );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(disappear),  disappear, GL_STATIC_DRAW );
+	}
+	else if (randomNum = 3)
+	{
+		point4 disappear[2] = {
+			point4(randomNum2, 1.0, 0.0, 1.0),
+			point4(randomNum2 + t1, 1.0, 0.0, 1.0)
+		};
+
+	glBindBuffer( GL_ARRAY_BUFFER, disappearBuffer[0] );
+	glBufferData( GL_ARRAY_BUFFER, sizeof(disappear),  disappear, GL_STATIC_DRAW );
+
+	}
+}
+
+
+//----------------------------------------------------------------------------
+
 // OpenGL initialization
 void
 init()
 {
-	
+	srand(time(NULL));
+
+	GLint randomNum = rand() % 4;
+	GLint randomNum2 = (rand() % 4)/4.0;
+
 	numSquares = 0;
 
-	drawSquares(-1, -1, 1, 1, 4, 4);
+	drawSquares(-0.5, -0.5, 1, 1, 4, 4);
+
+	exitMaker(randomNum, randomNum2);
 
     // Create and initialize a buffer object
 
@@ -110,6 +175,11 @@ display1( void )
 		glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 		glDrawArrays( GL_LINE_STRIP, 0, 5);
 	};
+
+	glUniform4fv(color_loc, 1, clearColor);
+	glBindBuffer( GL_ARRAY_BUFFER, disappearBuffer[0] );
+		glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+		glDrawArrays( GL_LINE_STRIP, 0, 2);
 	
 	glFlush();
 }

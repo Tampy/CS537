@@ -16,6 +16,9 @@
 
 #include <cmath>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 //  Define M_PI in the case it's not defined in the math header file
 #ifndef M_PI
