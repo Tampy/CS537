@@ -9,7 +9,7 @@
 //         The exit condition test and teh final position are computed in the fucntions animate and 
 //         findExitPoint.
 //
-// Note that to minimize the size of the buffers all points are stored as 2d vectors. 
+// Note that to minimize the size of the flyBuffers all points are stored as 2d vectors. 
 // The vertex shader makes sure to interopet the 2D vertex postion attributes  
 // as 4D vectors. 
 //
@@ -127,11 +127,11 @@ void init ()
 	curr = head;
 
 		
-	glGenBuffers( 2, &buffers[0] );
+	glGenBuffers( 2, &flyBuffers[0] );
 	
 
 
-    glBindBuffer( GL_ARRAY_BUFFER, buffers[0] );
+    glBindBuffer( GL_ARRAY_BUFFER, flyBuffers[0] );
 	glBufferData( GL_ARRAY_BUFFER, sizeof(bBox), bBox, GL_STATIC_DRAW );
 
 	// Load shaders and use the resulting shader program
@@ -143,9 +143,9 @@ void init ()
 
 
     // set up vertex attributes arrays
-    GLuint vPosition = glGetAttribLocation( program, "vPosition" );
-	glEnableVertexAttribArray( vPosition );
-    glVertexAttribPointer( vPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+    GLuint flyVPosition = glGetAttribLocation( program, "flyVPosition" );
+	glEnableVertexAttribArray( flyVPosition );
+    glVertexAttribPointer( flyVPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 	
 	width = maxX - minX;
 	height = maxY - minY;
@@ -159,19 +159,19 @@ void display()
 	glUniformMatrix4fv(projmat_loc, 1, GL_TRUE, projmat);
 
 	
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[0] );
+	glBindBuffer( GL_ARRAY_BUFFER, flyBuffers[0] );
 
 	//Draw box
 	modelview = Angel::mat4(1.0);
 	glUniformMatrix4fv(modelview_loc, 1, GL_TRUE, modelview);
-	glVertexAttribPointer( vPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+	glVertexAttribPointer( flyVPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 	glUniform4fv(draw_color_loc, 1, yelow_box_edge);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 
 	//Mark initial location
 	modelview = Angel::mat4(1.0)*Angel::Translate(vec4(head->x,head->y, 0.0, 0.0))*Angel::Scale(width/25.0, height/25.0, 1.0);
 	glUniformMatrix4fv(modelview_loc, 1, GL_TRUE, modelview);
-	glVertexAttribPointer( vPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+	glVertexAttribPointer( flyVPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 	glUniform4fv(draw_color_loc, 1, green_start_marker);
 	glDrawArrays(GL_QUADS, 0, 4);
 
@@ -180,9 +180,9 @@ void display()
 	glUniformMatrix4fv(modelview_loc, 1, GL_TRUE, modelview);
 	//copy the trajectory into a buffer 
 	GLfloat * trajectoryBuffer = copyToArray(head);
-	glBindBuffer( GL_ARRAY_BUFFER, buffers[1] );
+	glBindBuffer( GL_ARRAY_BUFFER, flyBuffers[1] );
 	glBufferData( GL_ARRAY_BUFFER, sizeof(GLfloat)*2*pointCount(head), trajectoryBuffer, GL_STREAM_DRAW);
-	glVertexAttribPointer( vPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+	glVertexAttribPointer( flyVPosition, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 	glUniform4fv(draw_color_loc, 1, blue_trajectory);
 	glDrawArrays(GL_LINE_STRIP, 0, pointCount(head));
 

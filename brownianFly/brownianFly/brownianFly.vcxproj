@@ -82,7 +82,6 @@
     <ClInclude Include="vec.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="hwk1.cpp" />
     <ClCompile Include="InitShader.cpp" />
     <ClCompile Include="lab3.cpp" />
   </ItemGroup>

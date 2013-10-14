@@ -15,8 +15,8 @@ using namespace std;
 GLfloat width;
 GLfloat height;
 
-GLuint buffers[3];
-GLuint vPosition;
+GLuint flyBuffers[3];
+GLuint flyVPosition;
 GLuint program; 
 GLuint projmat_loc;
 GLuint modelview_loc;
@@ -32,6 +32,8 @@ Angel::mat4 modelview;
 
 GLfloat minX=-0.5, minY=-0.5, maxX=0.5, maxY=0.5;
 
+GLfloat xColli, yColli;
+
 Angel::vec2 bBox[4]={
 	Angel::vec2(minX, minY),
 	Angel::vec2(maxX, minY),
@@ -45,7 +47,7 @@ struct pointNode* head = NULL;
 struct pointNode* curr = NULL;
 bool bPaused = false;
 bool bComplete = false;
-
+/*
 void m_glewInitAndVersion(void)
 {
    fprintf(stdout, "OpenGL Version: %s\n", glGetString(GL_VERSION));
@@ -56,7 +58,7 @@ void m_glewInitAndVersion(void)
    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
    }
    fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-}
+}*/
 
 
 void randomDisplacement(GLfloat magnitude, GLfloat &x, GLfloat &y);
@@ -68,6 +70,7 @@ GLfloat calcDisplacement(GLfloat xMin, GLfloat xMax, GLfloat yMin, GLfloat yMax)
 bool checkNode(struct pointNode * curr, GLfloat xMin, GLfloat xMax, GLfloat yMin, GLfloat yMax);
 void init ();
 void display();
+void collision();
 GLfloat* copyToArray(struct pointNode * head);
 void animate(int i);
 void keyboard (unsigned char key, int x, int y);
