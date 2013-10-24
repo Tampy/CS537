@@ -88,6 +88,7 @@ void animate(int i)
 {
 	GLfloat x, y, z;
 	pointNode * last;
+	int exitPt;
 	if(!bPaused && !bComplete)
 	{
 		GLfloat displacement = calcDisplacement();
@@ -106,7 +107,7 @@ void animate(int i)
 		}else
 		{
 			findExitPoint(last, curr);
-			colors[j] = collide_color;
+			colors[exitPt] = collide_color;
 			bComplete = true;
 		}
 	}
@@ -276,16 +277,6 @@ void init()
 	width = maxX - minX;
 	height = maxY - minY;
 }
-
-void display()
-{
-	int i;
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
-
-	//Connectiion with the shader
-	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
-	glEnableVertexAttribArray( vPosition );
 
 	void display()
 {
