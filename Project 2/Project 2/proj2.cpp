@@ -8,7 +8,7 @@ void randomDisplacement(GLfloat magnitude, GLfloat &side1, GLfloat &side2, GLflo
 	side3 = magnitude * tan(angle);
 }
 
-//this will count all the nodes after head;
+//counts the numbere of points after the provided pointNode
 int pointCount(struct pointNode* head)
 {
 	pointNode* tmp;
@@ -74,21 +74,20 @@ GLfloat calcDisplacement()
 	GLfloat lenY = maxY - minY;
 	GLfloat lenZ = maxZ - minZ;
 
-	if(lenX < lenY)
-	{
-		return lenX/50.0;
-	}
+	if(lenX < lenY && lenX < lenZ)
+		return lenX / 50.0;
+	else if (lenY < lenX && lenY < lenZ)
+		return lenY / 50.0;
 	else
-	{
-		return lenY/50.0;
-	}
+		return lenZ / 50.0;
 }
 
 void animate(int i)
 {
 	GLfloat x, y, z;
+	int count, j;
 	pointNode * last;
-	if(!bPaused && !bComplete)
+	if(!pause && !stopFly)
 	{
 		GLfloat displacement = calcDisplacement();
 		
@@ -99,15 +98,15 @@ void animate(int i)
 
 		glutPostRedisplay();
 		//We only want to keep going if 
-		if(checkNode(curr) < 0)
+		if(checkNode(curr) == 1)
 		{
 			//keep a roughly constat fps
 			glutTimerFunc(17, animate, 0);
 		}else
 		{
-			findExitPoint(last, curr);
-			colors[j] = collide_color;
-			bComplete = true;
+			j = findExitPoint(last, curr);
+			colors[j] = edgeColor;
+			stopFly = true;
 		}
 	}
 }
@@ -124,7 +123,7 @@ bool checkNode(struct pointNode * curr)
 	}
 }
 
-void findExitPoint(struct pointNode * prev, struct pointNode * last)
+int findExitPoint(struct pointNode * prev, struct pointNode * last)
 {
 	GLfloat slope;
 	GLfloat b; // y -intercept of  the line y = slope*x + b
@@ -178,21 +177,22 @@ void findExitPoint(struct pointNode * prev, struct pointNode * last)
 			yExit = minY;
 			xExit = (yExit - b) / slope;
 		}
-		
+		return 1;
 	}
+	return 0;
 }
 
 void init()
 {
-	int i, j, k, l;
-	GLfloat theta, rotateTheta, x, y, z, num_lines;
+	int i, j;
+	GLfloat theta, rotateTheta, x, y, num_lines;
 	num_lines = num_sides + 2;
 	vertices = (vec4*)malloc(num_verts*sizeof(vec4));
 	sides = (GLuint**)malloc((num_lines)*sizeof(GLuint*));
 	edges = (GLuint*)malloc((5*num_sides+1) * sizeof(GLuint));
 
 	for(i=0; i < num_lines;i++)
-		colors[i] = base_color;
+		colors[i] = faceColor;
 
 	theta = 0;
 	rotateTheta = (2.0 * PI) / (GLfloat) num_sides;
@@ -227,20 +227,20 @@ void init()
 	}
 	
 	sides[i] = new GLuint[4];
-	sides[i][0] = (num_sides-1)*2;
-	sides[i][1] = (num_sides-1)*2+1;
+	sides[i][0] = (num_sides - 1)*2;
+	sides[i][1] = (num_sides - 1)*2+1;
 	sides[i][2] = 0;
 	sides[i][3] = 1;
 
 	edges[0] = 0;
 
-	for (l = 0, k = 1; k < 46 ; 1)
+	for (i = 0, j = 1; j < 46 ; 1)
 	{
-		edges[k++] = (l + 1) % num_verts;
-		edges[k++] = (l + 3) % num_verts;
-		edges[k++] = (l + 2) % num_verts;
-		edges[k++] = (l) % num_verts;
-		edges[k++] = (l += 2) % num_verts;
+		edges[j++] = (i + 1) % num_verts;
+		edges[j++] = (i + 3) % num_verts;
+		edges[j++] = (i + 2) % num_verts;
+		edges[j++] = (i) % num_verts;
+		edges[j++] = (i += 2) % num_verts;
 	}
 
 	calcDisplacement();
@@ -262,7 +262,6 @@ void init()
 	modelview_loc = glGetUniformLocation(program, "modelview");
 	draw_color_loc = glGetUniformLocation(program, "vColor");
 
-
 	/** set up vertex attributes arrays*/
 	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
 	glEnableVertexAttribArray( vPosition );
@@ -282,30 +281,17 @@ void display()
 	int i;
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
-
-	//Connectiion with the shader
-	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
-	glEnableVertexAttribArray( vPosition );
-
-	void display()
-{
-	int i;
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
-
-	//Connectiion with the shader
 	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
 	glEnableVertexAttribArray( vPosition );
 
 	modelview = perspective * Translate(0.0f, 0.0f, -5.0f) * rotation;
 	glUniformMatrix4fv(modelview_loc, 1, GL_TRUE, modelview);
 
-	//Drawing the solid/volume in 3 parts -- sides, top, bottom
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
 	
-	//Draw the sides...
+	//Faces of the object
 	for (i=0;i<num_sides+2;i = i+1)
 	{
 		glUniform4fv(draw_color_loc, 1, colors[i]);
@@ -320,9 +306,8 @@ void display()
 		}
 	}
 	
-	
-	//Draw the edges
-	glUniform4fv(draw_color_loc, 1, edge_color);
+	//Edges
+	glUniform4fv(draw_color_loc, 1, edgeColor);
 	glDrawElements(GL_LINE_STRIP, num_sides * 5 + 1, GL_UNSIGNED_INT, edges);
 
 	glutSwapBuffers();
@@ -335,12 +320,12 @@ void keyboard (unsigned char key, int x, int y)
 	case 's':
 	case 'S':
 		glutTimerFunc(0, animate, 0);
-		bPaused = false;
-		bStarted = true;
+		pause = false;
+		startFly = true;
 		break;
 	case 'i':
 	case 'I':
-		bPaused = !bPaused;
+		pause = !pause;
 		glutTimerFunc(0, animate, 0);
 		break;
 	}
@@ -353,13 +338,13 @@ static void mouse(int button, int state, int x, int y)
 	{
 		if (state == GLUT_DOWN)
 		{
-			moving = 1;
+			moveCamera = 1;
 			startx = x;
 			starty = y;
 		}
 		if(state == GLUT_UP)
 		{	
-			moving = 0;
+			moveCamera = 0;
 		}
 	}
 }
@@ -367,22 +352,20 @@ static void mouse(int button, int state, int x, int y)
 
 static void motion(int x, int y)
 {
-	if(moving)
+	if (moveCamera)
 	{
-		angle = angle + (x -startx);
-		angle2 = angle2+(y-starty);
+		angle = angle + (x - startx);
+		angle2 = angle2 + (y - starty);
 		rotation = RotateX(angle2) * RotateY(angle);
 		startx = x;
 		starty = y;
 		glutPostRedisplay();
 	}
+}
 
 int main(int argc, char** argv)
 {
-
 	struct pointNode* tmp = NULL;
-
-	
 
 	height = maxY - minY;
 	width  =  maxX - minX;
@@ -400,7 +383,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
-	glutReshapeFunc(reshape);
+	//glutReshapeFunc(reshape);
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
@@ -408,7 +391,7 @@ int main(int argc, char** argv)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glutMainLoop();
-	delete[] verticies;
+	delete[] vertices;
 	delete[] sides;
 	delete[] edges;
 	return 0;
