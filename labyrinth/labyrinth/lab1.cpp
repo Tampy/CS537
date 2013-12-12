@@ -241,14 +241,14 @@ init()
 void
 display1( void )
 {
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 
-	glUniform4fv(color_loc, 1, blue_opaque);
+		glUniform4fv(color_loc, 1, blue_opaque);
 	
-	ctmat = Angel::mat4(1.0);
+		ctmat = Angel::mat4(1.0);
 
-	glUniformMatrix4fv(model_view_loc, 1, GL_TRUE, ctmat);
+		glUniformMatrix4fv(model_view_loc, 1, GL_TRUE, ctmat);	
 
 	for(int i = 0; i<16;i++)
 	{
