@@ -129,7 +129,7 @@ void display()
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
   glmDrawVBO(models[0], program);
-
+  /*
   // _________________________________Load the second model
   scale_x = 1;
   scale_y = 1;
@@ -165,7 +165,7 @@ void display()
   modelViewObject = Translate(-2, 0, -5)*scaleTransformation;
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glmDrawVBO(models[0], program);
-
+  */
 
   glutSwapBuffers();
 }
