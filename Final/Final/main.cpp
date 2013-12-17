@@ -47,18 +47,18 @@ void yaw(GLfloat num)
 
 void init()
 {
+	skyboxInit();
 
-  // Load the OBJ models from file
-	cout<<"Test\n";
-  models[0] = glmReadOBJ("car/car.obj");
-  cout<<"Test2\n";
-  if (!models[0]) exit(0);
-
-  //set up camera
+	//set up camera
   eye.x += 0.15;
   eye.y -= 1.75;
   eye.z -= 5.0;
   yaw(-ROTATE * 32);
+
+  glUseProgram(program[0]);
+  // Load the OBJ models from file
+  models[0] = glmReadOBJ("car/car.obj");
+  if (!models[0]) exit(0);
 
   // Normilize vertices
   glmUnitize(models[0]);
@@ -84,7 +84,7 @@ void init()
   vec4 light_position_distant = vec4(1.0, -1.0, -1.0, 0.0);
 
   // Load shaders and use the resulting shader program
-  program[0] = InitShader( "shader_vert.glsl", "shader_frag.glsl" );
+  program[0] = InitShader( "./shaders/shader_vert.glsl", "./shaders/shader_frag.glsl" ); 
   glUseProgram( program[0] );
   // set up vertex arrays
   glBindVertexArray( models[0]->vao );
@@ -105,8 +105,6 @@ void init()
   glEnable( GL_DEPTH_TEST );
   glDepthFunc(GL_LESS);
   glClearColor( 0.0, 0.0, 0.0, 1.0 );
-
- // skyboxInit();
 }
 
 void skyboxInit()
@@ -126,10 +124,9 @@ void skyboxInit()
 	 glGenVertexArrays(2, VAO);
 
 // Load shaders and use the resulting shader programs
-    //program[0] = InitShader( "./shaders/vshader30_TwoCubes_FullPipe.glsl", "./shaders/fshader30_TwoCubes.glsl" ); 
-	program[1] = InitShader( "./shaders/skyboxvertex.glsl", "./shaders/skyboxfragment.glsl" ); 
-	
     
+	program[1] = InitShader( "./shaders/skyboxvertex.glsl", "./shaders/skyboxfragment.glsl" ); 
+
 	//VAO[1] the skybox
 	glUseProgram( program[1] );
 	glBindVertexArray(VAO[1]);
@@ -151,7 +148,7 @@ void skyboxInit()
 	
 	//Load Skybox Images. 6 images to represent the 6 angles of view. Inside it's own structured Cubemap
     skybox.top = glmReadPPM("skybox\\sky-top.ppm", &skybox.topWidth, &skybox.topHeight);
-	skybox.bottom = glmReadPPM("skybox\\sky-bottom.ppm", &skybox.bottomWidth, &skybox.bottomHeight);
+	skybox.bottom = glmReadPPM("skybox\\grass-bottom.ppm", &skybox.bottomWidth, &skybox.bottomHeight);
     skybox.right = glmReadPPM("skybox\\sky-right.ppm", &skybox.rightWidth, &skybox.rightHeight);
     skybox.left = glmReadPPM("skybox\\sky-left.ppm", &skybox.leftWidth, &skybox.leftHeight);
     skybox.front = glmReadPPM("skybox\\sky-front.ppm", &skybox.frontWidth, &skybox.frontHeight);
@@ -201,11 +198,16 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // Setup camera
-  mat4 modelViewCamera = LookAt(eye, eye-n, v);
-  glUniformMatrix4fv(ModelViewCam, 1, GL_TRUE, modelViewCamera);
+	displaySkybox();
 
-  //displaySkybox();
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+
+  // Setup camera
+  mat4 modelViewCamera = LookAt(eye, eye-n, v)*model_view;
+  glUniformMatrix4fv(ModelViewCam, 1, GL_TRUE, modelViewCamera);
+  glUseProgram(program[0]);
+  
 
   float scale_x, scale_y, scale_z;
   mat4 scaleTransformation;
@@ -223,8 +225,8 @@ void display()
   invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
   normalMatrix =  RotateX( xrot ) * RotateY( yrot ) * invScaleTranformation;
   modelViewObject = Translate(0.0, 0.0, 5.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
-  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
+  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glmDrawVBO(models[0], program[0]);
 
   glutSwapBuffers();
@@ -232,7 +234,8 @@ void display()
 
 void displaySkybox()
 {
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glDisable(GL_DEPTH_TEST);
+	glDepthMask(false);
 
 //Make sure you start with the Default Coordinate Systems
 	projmat=mat4(1.0);
@@ -255,18 +258,12 @@ void displaySkybox()
 	glBindVertexArray(VAO[1]);
 
 	glCullFace(GL_BACK);
-	glDisable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE);
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glDrawArrays(GL_QUADS, 0, 24);
-	
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
 
 	glUseProgram(0);
 
 	model_view = Angel::mat4(1.0);
-
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -290,7 +287,7 @@ void keyboard(unsigned char key, int x, int y)
 			}
 			break;
 		//debugging cases
-		/*case 'Z':
+		case 'Z':
 			roll(ROTATE);
 			break;
 		case 'z':
@@ -325,7 +322,7 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 		case 'U':
 			eye.z += 5.0;
-			break;*/
+			break;
 	}
 	glutPostRedisplay();
 }
@@ -335,7 +332,7 @@ void arrow(int key, int x, int y)
 	switch(key)
 	{
 		//camera debugging cases
-		/*case GLUT_KEY_UP:
+		case GLUT_KEY_UP:
 			eye -= ROTATE * n;
 			break;
 		case GLUT_KEY_DOWN:
@@ -346,7 +343,7 @@ void arrow(int key, int x, int y)
 			break;
 		case GLUT_KEY_RIGHT:
 			eye += ROTATE * u;
-			break;*/
+			break;
 	}
 	glutPostRedisplay();
 }
