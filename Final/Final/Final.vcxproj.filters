@@ -34,9 +34,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <ClInclude Include="MatrixStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+=======
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 =======
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
   </ItemGroup>

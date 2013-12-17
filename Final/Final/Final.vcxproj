@@ -81,7 +81,10 @@
     <ClInclude Include="glm.h" />
     <ClInclude Include="mat.h" />
 <<<<<<< HEAD
+<<<<<<< HEAD
     <ClInclude Include="MatrixStack.h" />
+=======
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 =======
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
     <ClInclude Include="vec.h" />

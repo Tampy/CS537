@@ -55,6 +55,7 @@ void init()
   if (!models[0]) exit(0);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   //set up camera
   eye.x += 0.15;
   eye.y -= 1.75;
@@ -63,6 +64,8 @@ void init()
 
   defaultEye = eye;
 
+=======
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 =======
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
   // Normilize vertices
@@ -90,6 +93,7 @@ void init()
 
   // Load shaders and use the resulting shader program
 <<<<<<< HEAD
+<<<<<<< HEAD
   program[0] = InitShader( "shader_vert.glsl", "shader_frag.glsl" );
   glUseProgram( program[0] );
   // set up vertex arrays
@@ -107,6 +111,8 @@ void init()
   Projection = glGetUniformLocation( program[0], "projection" );
   NormalTransformation = glGetUniformLocation( program[0], "normalTransformation" );
 =======
+=======
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
   program = InitShader( "shader_vert.glsl", "shader_frag.glsl" );
   glUseProgram( program );
   // set up vertex arrays
@@ -123,11 +129,15 @@ void init()
   ModelViewObj = glGetUniformLocation(program, "ModelViewObj");
   Projection = glGetUniformLocation( program, "projection" );
   NormalTransformation = glGetUniformLocation( program, "normalTransformation" );
+<<<<<<< HEAD
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
+=======
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 
   glClearDepth( 1.0 ); 
   glEnable( GL_DEPTH_TEST );
   glDepthFunc(GL_LESS);
+<<<<<<< HEAD
 <<<<<<< HEAD
   glClearColor( 0.0, 0.0, 0.0, 1.0 );
 
@@ -223,6 +233,9 @@ void skyboxInit()
 =======
   glClearColor( 0.0, 0.0, 0.0, 1.0 ); 
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
+=======
+  glClearColor( 0.0, 0.0, 0.0, 1.0 ); 
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 }
 
 void display()
@@ -234,8 +247,12 @@ void display()
   glUniformMatrix4fv(ModelViewCam, 1, GL_TRUE, modelViewCamera);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   //displaySkybox();
 
+=======
+ 
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 =======
  
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
@@ -254,6 +271,7 @@ void display()
   // Inverse Scale Transformation Matrix 
   invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
   normalMatrix =  RotateX( xrot ) * RotateY( yrot ) * invScaleTranformation;
+<<<<<<< HEAD
 <<<<<<< HEAD
   modelViewObject = Translate(0.0, 0.0, 5.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
@@ -301,6 +319,8 @@ void displaySkybox()
 	model_view = Angel::mat4(1.0);
 
 =======
+=======
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
   modelViewObject = Translate(0.0, 0.0, 2.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
@@ -344,6 +364,9 @@ void displaySkybox()
   */
 
   glutSwapBuffers();
+<<<<<<< HEAD
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
+=======
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 }
 
@@ -369,6 +392,7 @@ void keyboard(unsigned char key, int x, int y)
 		case 'c':
 			yaw(-ROTATE);
 			break;
+<<<<<<< HEAD
 <<<<<<< HEAD
 		case 'v':
 			/*
@@ -404,6 +428,8 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 =======
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
+=======
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 	}
 	glutPostRedisplay();
 }
@@ -435,12 +461,15 @@ void reshape( int width, int height )
 	mat4  projection = Perspective( 45.0, aspect, 0.0001, 300.0 );
 	glUniformMatrix4fv( Projection, 1, GL_TRUE, projection );
 <<<<<<< HEAD
+<<<<<<< HEAD
 	glutPostRedisplay();
 }
 
 void idle()
 {
 	glutPostRedisplay();
+=======
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 =======
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 }
@@ -464,7 +493,10 @@ int main(int argc, char** argv)
 	glutSpecialFunc(arrow);
 	glutReshapeFunc(reshape);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	glutIdleFunc(idle);
+=======
+>>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 =======
 >>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 
