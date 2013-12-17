@@ -20,18 +20,12 @@ using namespace std;
 #define MAX_Y 3
 #define ROTATE 0.1
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 #define X               0
 #define Y               1
 #define Z               2
 #define SCALE_VECTOR    1.0
 #define SCALE_ANGLE     1.0
 
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
@@ -42,8 +36,6 @@ int num_vert;
 
 #define SCALE_VECTOR    0.5
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GLuint program[3]; 
 GLuint VAO[3];
 GLuint buffers[5];
@@ -54,14 +46,6 @@ GLuint proj_loc;
 GLuint model_view_loc;
 
 enum {cube_vertices, cube_indeces, wire_indeces, cube_vertices_explicit};
-=======
-GLuint program;
-GLuint ModelViewCam, ModelViewObj, Projection, LightPosition, NormalTransformation;
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
-GLuint program;
-GLuint ModelViewCam, ModelViewObj, Projection, LightPosition, NormalTransformation;
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 
 GLuint vPosition;
 GLuint vNormal;
@@ -78,20 +62,14 @@ vec4 u = vec4(1, 0, 0, 0);
 vec4 v = vec4(0, 1, 0, 0);
 vec4 n = vec4(0, 0, 1, 0);
 vec4 eye = vec4(0,2,10,1);
-<<<<<<< HEAD
-<<<<<<< HEAD
-vec4 defaultEye;
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
+
+//checks if we're in helicopter or car camera
+bool heliCam;
 
 void roll(GLfloat num);
 void pitch(GLfloat num);
 void yaw(GLfloat num);
 void init();
-<<<<<<< HEAD
-<<<<<<< HEAD
 void skyboxInit();
 void display();
 void displaySkybox();
@@ -219,17 +197,3 @@ mat4 model_view = Angel::mat4(1.0);
 
 mat4 modelviewStackTop = mat4(1.0);
 mat4 modelviewStackBottom=  mat4(1.0);
-=======
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-void display();
-void keyboard(unsigned char key, int x, int y);
-void arrow(int key, int x, int y);
-void reshape(GLint w, GLint h);
-int main(int argc, char** argv);
-<<<<<<< HEAD
-void getGLinfo();
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
-void getGLinfo();
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c

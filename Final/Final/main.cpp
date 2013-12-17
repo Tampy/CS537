@@ -54,20 +54,12 @@ void init()
   cout<<"Test2\n";
   if (!models[0]) exit(0);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   //set up camera
   eye.x += 0.15;
   eye.y -= 1.75;
   eye.z -= 5.0;
   yaw(-ROTATE * 32);
 
-  defaultEye = eye;
-
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
   // Normilize vertices
   glmUnitize(models[0]);
   // Compute facet normals
@@ -92,8 +84,6 @@ void init()
   vec4 light_position_distant = vec4(1.0, -1.0, -1.0, 0.0);
 
   // Load shaders and use the resulting shader program
-<<<<<<< HEAD
-<<<<<<< HEAD
   program[0] = InitShader( "shader_vert.glsl", "shader_frag.glsl" );
   glUseProgram( program[0] );
   // set up vertex arrays
@@ -110,35 +100,10 @@ void init()
   ModelViewObj = glGetUniformLocation(program[0], "ModelViewObj");
   Projection = glGetUniformLocation( program[0], "projection" );
   NormalTransformation = glGetUniformLocation( program[0], "normalTransformation" );
-=======
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-  program = InitShader( "shader_vert.glsl", "shader_frag.glsl" );
-  glUseProgram( program );
-  // set up vertex arrays
-  glBindVertexArray( models[0]->vao );
-
-  glUseProgram( program );
-
-  glUniform4fv( glGetUniformLocation(program, "light_ambient"),1, light_ambient);
-  glUniform4fv( glGetUniformLocation(program, "light_diffuse"),1, light_diffuse);
-  glUniform4fv( glGetUniformLocation(program, "light_specular"),1, light_specular);	
-  glUniform4fv( glGetUniformLocation(program, "lightPosition"),1, light_position_distant );
-  // Retrieve transformation uniform variable locations
-  ModelViewCam = glGetUniformLocation( program, "modelView" );
-  ModelViewObj = glGetUniformLocation(program, "ModelViewObj");
-  Projection = glGetUniformLocation( program, "projection" );
-  NormalTransformation = glGetUniformLocation( program, "normalTransformation" );
-<<<<<<< HEAD
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 
   glClearDepth( 1.0 ); 
   glEnable( GL_DEPTH_TEST );
   glDepthFunc(GL_LESS);
-<<<<<<< HEAD
-<<<<<<< HEAD
   glClearColor( 0.0, 0.0, 0.0, 1.0 );
 
  // skyboxInit();
@@ -230,12 +195,6 @@ void skyboxInit()
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, skybox.backWidth, skybox.backHeight, 0,
                  GL_RGB, GL_UNSIGNED_BYTE,skybox.back);
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-=======
-  glClearColor( 0.0, 0.0, 0.0, 1.0 ); 
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
-  glClearColor( 0.0, 0.0, 0.0, 1.0 ); 
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 }
 
 void display()
@@ -246,16 +205,8 @@ void display()
   mat4 modelViewCamera = LookAt(eye, eye-n, v);
   glUniformMatrix4fv(ModelViewCam, 1, GL_TRUE, modelViewCamera);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   //displaySkybox();
 
-=======
- 
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
- 
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
   float scale_x, scale_y, scale_z;
   mat4 scaleTransformation;
   mat4 invScaleTranformation;
@@ -271,8 +222,6 @@ void display()
   // Inverse Scale Transformation Matrix 
   invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
   normalMatrix =  RotateX( xrot ) * RotateY( yrot ) * invScaleTranformation;
-<<<<<<< HEAD
-<<<<<<< HEAD
   modelViewObject = Translate(0.0, 0.0, 5.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
@@ -318,63 +267,30 @@ void displaySkybox()
 
 	model_view = Angel::mat4(1.0);
 
-=======
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-  modelViewObject = Translate(0.0, 0.0, 2.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
-  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
-  glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
-  glmDrawVBO(models[0], program);
-  /*
-  // _________________________________Load the second model
-  scale_x = 1;
-  scale_y = 1;
-  scale_z = 1;
-  // Scale Transformation Matrix
-  scaleTransformation = Scale(scale_x, scale_y, scale_z);
-  // Inverse Scale Transformation Matrix 
-  invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
-  normalMatrix = invScaleTranformation;
-  modelViewObject = Translate(2, 2, 0)*scaleTransformation;
-  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
-  glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
-  glmDrawVBO(models[1], program);
-
-  // _________________________________Load the third model multiple times
-  scale_x = 1;
-  scale_y = 1;
-  scale_z =1;
-  // Scale Transformation Matrix
-  scaleTransformation = Scale(scale_x, scale_y, scale_z);
-  // Inverse Scale Transformation Matrix 
-  invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
-  normalMatrix = invScaleTranformation;
-  glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
-  modelViewObject = Translate(-5, 0, -3)*scaleTransformation; 
-  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
-  glmDrawVBO(models[0], program);
-
-  modelViewObject = Translate(-3, 0, -3)*scaleTransformation;
-  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
-  glmDrawVBO(models[0], program);
-
-  modelViewObject = Translate(-2, 0, -5)*scaleTransformation;
-  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
-  glmDrawVBO(models[0], program);
-  */
-
-  glutSwapBuffers();
-<<<<<<< HEAD
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 }
 
 void keyboard(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
-		case 'Z':
+		case 'v':
+			if(!heliCam)
+			{
+				pitch(1.0);
+				eye += ROTATE * n * 100;
+				heliCam = true;
+			}
+			break;
+		case 'V':
+			if(heliCam)
+			{
+				eye -= ROTATE * n * 100;
+				pitch(-1.0);
+				heliCam = false;
+			}
+			break;
+		//debugging cases
+		/*case 'Z':
 			roll(ROTATE);
 			break;
 		case 'z':
@@ -391,22 +307,6 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 		case 'c':
 			yaw(-ROTATE);
-			break;
-<<<<<<< HEAD
-<<<<<<< HEAD
-		case 'v':
-			/*
-			eye.y -= 3.5;
-			pitch(-0.4);
-			eye.z -= 5.0;*/
-			pitch(ROTATE * 10);
-			eye += ROTATE * n * 100;
-			break;
-		case 'V':
-			/*
-			pitch(ROTATE * -10);
-			eye -= ROTATE * n * 100;*/
-			eye = defaultEye;
 			break;
 		case 't':
 			eye.x -= 0.15;
@@ -425,11 +325,7 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 		case 'U':
 			eye.z += 5.0;
-			break;
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
+			break;*/
 	}
 	glutPostRedisplay();
 }
@@ -438,7 +334,8 @@ void arrow(int key, int x, int y)
 {
 	switch(key)
 	{
-		case GLUT_KEY_UP:
+		//camera debugging cases
+		/*case GLUT_KEY_UP:
 			eye -= ROTATE * n;
 			break;
 		case GLUT_KEY_DOWN:
@@ -449,7 +346,7 @@ void arrow(int key, int x, int y)
 			break;
 		case GLUT_KEY_RIGHT:
 			eye += ROTATE * u;
-			break;
+			break;*/
 	}
 	glutPostRedisplay();
 }
@@ -460,18 +357,12 @@ void reshape( int width, int height )
 	GLfloat aspect = GLfloat(width)/height;
 	mat4  projection = Perspective( 45.0, aspect, 0.0001, 300.0 );
 	glUniformMatrix4fv( Projection, 1, GL_TRUE, projection );
-<<<<<<< HEAD
-<<<<<<< HEAD
 	glutPostRedisplay();
 }
 
 void idle()
 {
 	glutPostRedisplay();
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 }
 
 int main(int argc, char** argv)
@@ -492,13 +383,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(arrow);
 	glutReshapeFunc(reshape);
-<<<<<<< HEAD
-<<<<<<< HEAD
 	glutIdleFunc(idle);
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
-=======
->>>>>>> ac329404af005dc70c496513eb05c32a7404e59c
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
