@@ -71,8 +71,10 @@ void pitch(GLfloat num);
 void yaw(GLfloat num);
 void init();
 void skyboxInit();
+void houseInit();
 void display();
 void displaySkybox();
+void displayHouse();
 void keyboard(unsigned char key, int x, int y);
 void arrow(int key, int x, int y);
 void reshape(GLint w, GLint h);
@@ -152,7 +154,22 @@ public:
         return _matrices[_index];
     }
 };
+//car struc
+GLuint carTexture[2];
 
+
+typedef struct
+{
+	int inWidth;
+	int inHeight;
+	GLubyte *in;
+
+	int outWidth;
+	int outHeight;
+	GLubyte *out;
+}	carMap;
+
+carMap car;
 //Skybox struc
 GLuint texture;
 typedef struct
@@ -197,3 +214,24 @@ mat4 model_view = Angel::mat4(1.0);
 
 mat4 modelviewStackTop = mat4(1.0);
 mat4 modelviewStackBottom=  mat4(1.0);
+
+typedef struct{
+	//material mat;
+	mat4 transform;
+	int num_verts;
+	int shape;
+} createdModel;
+
+createdModel ground;
+
+typedef struct{
+	mat4 translation;
+	mat4 rotation;
+	mat4 scale;
+}	position;
+
+position *houses;
+int numHouses;
+GLushort **houseIndex;
+GLushort *houseVerts;
+vec4 *houseColor;

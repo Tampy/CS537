@@ -48,6 +48,7 @@ void yaw(GLfloat num)
 void init()
 {
 	skyboxInit();
+	houseInit();
 
 	//set up camera
   eye.x += 0.15;
@@ -101,6 +102,50 @@ void init()
   Projection = glGetUniformLocation( program[0], "projection" );
   NormalTransformation = glGetUniformLocation( program[0], "normalTransformation" );
 
+  car.in = glmReadPPM("car\\car_in_d.ppm", &car.inHeight, &car.inWidth);
+  car.out = glmReadPPM("car\\car_out_d.ppm", &car.outHeight, &car.outWidth);
+
+  glActiveTexture(GL_TEXTURE1);
+  glGenTextures(1, &carTexture[0]);
+  glGenTextures(1, &carTexture[1]);
+
+  int isEnabled=0; 
+	
+	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE) {isEnabled = 1;} else {isEnabled = 0;};
+
+	std::cout << isEnabled << std::endl;
+
+	glEnable(GL_TEXTURE_2D);
+
+	if (glIsEnabled(GL_TEXTURE_2D) == GL_TRUE) {isEnabled = 1;} else {isEnabled = 0;};
+
+	std::cout << isEnabled << std::endl;
+
+	glBindTexture(GL_TEXTURE_2D, carTexture[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, car.inWidth, car.inHeight, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE,car.in);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+    
+	glBindTexture(GL_TEXTURE_2D, carTexture[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, car.outWidth, car.outHeight, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE,car.out);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	ground.num_verts = 108;
+	ground.shape = 0;
+	ground.transform = Translate(0.0f, -2.0f, 0.0f)*Scale(500.0f, 0.1f, 500.0f);
+
+
   glClearDepth( 1.0 ); 
   glEnable( GL_DEPTH_TEST );
   glDepthFunc(GL_LESS);
@@ -134,16 +179,9 @@ void skyboxInit()
 	vPosition = glGetAttribLocation( program[1], "vPosition" );
 	glEnableVertexAttribArray( vPosition );
 	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+
    	//done with this packet
     glBindVertexArray(0); 
-	glUseProgram(0);
-
-	vPosition = glGetAttribLocation( program[0], "vPosition" );
-	glEnableVertexAttribArray( vPosition );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
-   	//done with this packet
-    glBindVertexArray(0); 
-
 	glUseProgram(0);
 	
 	//Load Skybox Images. 6 images to represent the 6 angles of view. Inside it's own structured Cubemap
@@ -194,11 +232,58 @@ void skyboxInit()
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
+void houseInit()
+{
+	int i;
+	numHouses = 3;
+	houses = (position*)malloc(numHouses*sizeof(position));
+	houseIndex = (GLushort**)malloc(8*sizeof(GLushort*));
+	houseVerts = (GLushort*)malloc(8*sizeof(GLushort*));
+	houseColor = (vec4*)malloc(8*sizeof(GLushort));
+
+	for (i=0;i<numHouses;i++)
+	{
+		houses[i].rotation = RotateX(0)*RotateY(0)*RotateZ(30*i);
+		houses[i].translation = Translate(0.75*i, 0.75*i, 0.0);
+		houses[i].scale = Scale(1.0, 1.0, 1.0);
+	}
+
+	for (i=0;i<8;i++){
+		if (i<4){
+			house_index[i] = new GLushort[4];
+			house_num_verts[i] = 4;
+			house_color[i] = vec4(0.0, 0.5, 0.0, 1.0);
+			for (j=2*i;j<2*i+4;j++){
+				house_index[i][j-2*i] = j%8;
+			}
+		}else{
+			if (i<6){
+				house_index[i] = new GLushort[4];
+				house_num_verts[i] = 4;
+				house_color[i] = vec4(0.5, 0.0, 0.0, 1.0);
+				house_index[i][0] = 4*(i-4);
+				house_index[i][1] = 4*(i-4)+2;
+				house_index[i][2] = 4+i;
+				house_index[i][3] = 13-i;
+				cout << house_color[i] << endl;
+			}else{
+				house_index[i] = new GLushort[3];
+				house_num_verts[i] = 3;
+				house_color[i] = vec4(0.5, 0.0, 0.0, 1.0);
+				house_index[i][0] = (4*(i-6)+2);
+				house_index[i][1] = (4*(i-6)+4)%8;
+				house_index[i][2] = 15-i;
+			}
+		}
+	}
+
+}
+
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	displaySkybox();
+	//displaySkybox();
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
