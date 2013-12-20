@@ -269,7 +269,7 @@ void display()
   invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
   normalMatrix =  RotateX( xrot ) * RotateY( yrot ) * invScaleTranformation;
   //modelViewObject = Translate(0.0, 0.0, 5.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
-  modelViewObject = Translate(0.0, 0.0, 5.0)*RotateY(180.0)*scaleTransformation;
+  modelViewObject = Translate(0.0, drive, 5.0)*RotateY(180.0)*scaleTransformation;
   glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glmDrawVBO(models[0], program[0]);
@@ -354,6 +354,7 @@ void keyboard(unsigned char key, int x, int y)
 			}
 			break;
 		//debugging cases
+		/*
 		case 'Z':
 			roll(ROTATE);
 			break;
@@ -389,7 +390,7 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 		case 'U':
 			eye.z += 5.0;
-			break;
+			break;*/
 	}
 	glutPostRedisplay();
 }
@@ -398,10 +399,13 @@ void arrow(int key, int x, int y)
 {
 	switch(key)
 	{
-		//camera debugging cases
+		
 		case GLUT_KEY_UP:
 			eye -= ROTATE * n;
+			drive += 1.0;
+			upPressed = true;
 			break;
+		//camera debugging cases
 		case GLUT_KEY_DOWN:
 			eye += ROTATE * n;
 			break;
@@ -415,6 +419,15 @@ void arrow(int key, int x, int y)
 	glutPostRedisplay();
 }
 
+void arrowUp(int key, int x, int y)
+{
+	switch (key)
+	{
+		case GLUT_KEY_UP:
+			upPressed = false;
+			break;
+	}
+}
 void reshape( int width, int height )
 {
 	glViewport( 0, 0, width, height );
@@ -426,6 +439,8 @@ void reshape( int width, int height )
 
 void idle()
 {
+	if (upPressed)
+		drive += 1.0;
 	glutPostRedisplay();
 }
 
@@ -446,6 +461,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(arrow);
+	glutSpecialUpFunc(arrowUp);
 	glutReshapeFunc(reshape);
 	glutIdleFunc(idle);
 

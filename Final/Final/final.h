@@ -38,7 +38,6 @@ int num_vert;
 
 GLuint program[3]; 
 GLuint VAO[3];
-GLuint VBO[2];
 GLuint buffers[5];
 
 GLuint ModelViewCam, ModelViewObj, Projection, LightPosition, NormalTransformation;
@@ -52,12 +51,16 @@ GLuint vPosition;
 GLuint vNormal;
 int winHeight = 480;
 int winWidth = 640;
-bool mouseDown = false;
+
+bool upPressed = false;
+
 float xrot = -20;
 float yrot = 0;
 float xdiff = 0;
 float ydiff = 0;
+
 GLfloat step = 5;
+GLfloat drive = 0.0;
 // Camera Coordianate System
 vec4 u = vec4(1, 0, 0, 0);
 vec4 v = vec4(0, 1, 0, 0);
@@ -76,6 +79,7 @@ void display();
 void displaySkybox();
 void keyboard(unsigned char key, int x, int y);
 void arrow(int key, int x, int y);
+void arrowUp(int key, int x, int y)
 void reshape(GLint w, GLint h);
 void idle();
 int main(int argc, char** argv);
