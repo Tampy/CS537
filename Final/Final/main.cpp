@@ -47,28 +47,33 @@ void yaw(GLfloat num)
 
 void init()
 {
-	skyboxInit();
-	houseInit();
+	//skyboxInit();
 
 	//set up camera
   eye.x += 0.15;
   eye.y -= 1.75;
   eye.z -= 5.0;
-  yaw(-ROTATE * 32);
+  eye -= 3 * ROTATE * u;
+  eye += 2 * ROTATE * n;
 
-  glUseProgram(program[0]);
   // Load the OBJ models from file
   models[0] = glmReadOBJ("car/car.obj");
+  models[1] = glmReadOBJ("house/CasaSimples.obj"); 
   if (!models[0]) exit(0);
+  if (!models[1]) exit(0);
 
   // Normilize vertices
   glmUnitize(models[0]);
+  glmUnitize(models[1]);
   // Compute facet normals
   glmFacetNormals(models[0]);
+  glmFacetNormals(models[1]);
   // Comput vertex normals
-  glmVertexNormals(models[0], 90.0);  
+  glmVertexNormals(models[0], 90.0);
+  glmVertexNormals(models[1], 90.0); 
   // Load the model (vertices and normals) into a vertex buffer
   glmLoadInVBO(models[0]);
+  glmLoadInVBO(models[1]);
 
   // Setup some sample materials
   color4 light_ambient( 0.2, 0.2, 0.2, 1.0 );
@@ -169,6 +174,7 @@ void skyboxInit()
 	 glGenVertexArrays(2, VAO);
 
 // Load shaders and use the resulting shader programs
+
     
 	program[1] = InitShader( "./shaders/skyboxvertex.glsl", "./shaders/skyboxfragment.glsl" ); 
 
@@ -232,53 +238,6 @@ void skyboxInit()
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
-void houseInit()
-{
-	int i;
-	numHouses = 3;
-	houses = (position*)malloc(numHouses*sizeof(position));
-	houseIndex = (GLushort**)malloc(8*sizeof(GLushort*));
-	houseVerts = (GLushort*)malloc(8*sizeof(GLushort*));
-	houseColor = (vec4*)malloc(8*sizeof(GLushort));
-
-	for (i=0;i<numHouses;i++)
-	{
-		houses[i].rotation = RotateX(0)*RotateY(0)*RotateZ(30*i);
-		houses[i].translation = Translate(0.75*i, 0.75*i, 0.0);
-		houses[i].scale = Scale(1.0, 1.0, 1.0);
-	}
-
-	for (i=0;i<8;i++){
-		if (i<4){
-			house_index[i] = new GLushort[4];
-			house_num_verts[i] = 4;
-			house_color[i] = vec4(0.0, 0.5, 0.0, 1.0);
-			for (j=2*i;j<2*i+4;j++){
-				house_index[i][j-2*i] = j%8;
-			}
-		}else{
-			if (i<6){
-				house_index[i] = new GLushort[4];
-				house_num_verts[i] = 4;
-				house_color[i] = vec4(0.5, 0.0, 0.0, 1.0);
-				house_index[i][0] = 4*(i-4);
-				house_index[i][1] = 4*(i-4)+2;
-				house_index[i][2] = 4+i;
-				house_index[i][3] = 13-i;
-				cout << house_color[i] << endl;
-			}else{
-				house_index[i] = new GLushort[3];
-				house_num_verts[i] = 3;
-				house_color[i] = vec4(0.5, 0.0, 0.0, 1.0);
-				house_index[i][0] = (4*(i-6)+2);
-				house_index[i][1] = (4*(i-6)+4)%8;
-				house_index[i][2] = 15-i;
-			}
-		}
-	}
-
-}
-
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -309,10 +268,33 @@ void display()
   // Inverse Scale Transformation Matrix 
   invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
   normalMatrix =  RotateX( xrot ) * RotateY( yrot ) * invScaleTranformation;
-  modelViewObject = Translate(0.0, 0.0, 5.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
+  //modelViewObject = Translate(0.0, 0.0, 5.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
+  modelViewObject = Translate(0.0, 0.0, 5.0)*RotateY(180.0)*scaleTransformation;
   glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glmDrawVBO(models[0], program[0]);
+  
+  // _________________________________Load the second model multiple times
+  scale_x = 1;
+  scale_y = 1;
+  scale_z =1;
+  // Scale Transformation Matrix
+  scaleTransformation = Scale(scale_x, scale_y, scale_z);
+  // Inverse Scale Transformation Matrix 
+  invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
+  normalMatrix = invScaleTranformation;
+  glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
+  modelViewObject = Translate(-5, 0, -3)*scaleTransformation; 
+  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
+  glmDrawVBO(models[1], program[0]);
+
+  modelViewObject = Translate(-3, 0, -3)*scaleTransformation;
+  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
+  glmDrawVBO(models[1], program[0]);
+
+  modelViewObject = Translate(-2, 0, -5)*scaleTransformation;
+  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
+  glmDrawVBO(models[1], program[0]);
 
   glutSwapBuffers();
 }

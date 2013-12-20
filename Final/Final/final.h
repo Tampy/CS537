@@ -29,7 +29,7 @@ using namespace std;
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
-GLMmodel* models[1];
+GLMmodel* models[2];
 int VBO_num_vert;
 int VBO_num_norm;
 int num_vert;
@@ -38,6 +38,7 @@ int num_vert;
 
 GLuint program[3]; 
 GLuint VAO[3];
+GLuint VBO[2];
 GLuint buffers[5];
 
 GLuint ModelViewCam, ModelViewObj, Projection, LightPosition, NormalTransformation;
@@ -71,10 +72,8 @@ void pitch(GLfloat num);
 void yaw(GLfloat num);
 void init();
 void skyboxInit();
-void houseInit();
 void display();
 void displaySkybox();
-void displayHouse();
 void keyboard(unsigned char key, int x, int y);
 void arrow(int key, int x, int y);
 void reshape(GLint w, GLint h);
@@ -229,9 +228,3 @@ typedef struct{
 	mat4 rotation;
 	mat4 scale;
 }	position;
-
-position *houses;
-int numHouses;
-GLushort **houseIndex;
-GLushort *houseVerts;
-vec4 *houseColor;
