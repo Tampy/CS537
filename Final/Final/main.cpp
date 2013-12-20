@@ -47,7 +47,7 @@ void yaw(GLfloat num)
 
 void init()
 {
-	//skyboxInit();
+	skyboxInit();
 
 	//set up camera
   eye.x += 0.15;
@@ -440,7 +440,10 @@ void reshape( int width, int height )
 void idle()
 {
 	if (upPressed)
+	{
 		drive += 1.0;
+		eye -= ROTATE * n;
+	}
 	glutPostRedisplay();
 }
 
