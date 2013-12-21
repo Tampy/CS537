@@ -109,10 +109,12 @@ void init()
 
   car.in = glmReadPPM("car\\car_in_d.ppm", &car.inHeight, &car.inWidth);
   car.out = glmReadPPM("car\\car_out_d.ppm", &car.outHeight, &car.outWidth);
+  houseInfo.house = glmReadPPM("house\\casaSimples_D.ppm", &houseInfo.houseHeight, &houseInfo.houseWidth);
 
   glActiveTexture(GL_TEXTURE1);
   glGenTextures(1, &carTexture[0]);
   glGenTextures(1, &carTexture[1]);
+  glGenTextures(1, &houseTexture);
 
   int isEnabled=0; 
 	
@@ -135,7 +137,7 @@ void init()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
     
-	glBindTexture(GL_TEXTURE_2D, carTexture[0]);
+	glBindTexture(GL_TEXTURE_2D, carTexture[1]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, car.outWidth, car.outHeight, 0,
                  GL_RGB, GL_UNSIGNED_BYTE,car.out);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -144,11 +146,20 @@ void init()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 
+	glBindTexture(GL_TEXTURE_2D, houseTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, houseInfo.houseWidth, houseInfo.houseHeight, 0,
+		GL_RGB, GL_UNSIGNED_BYTE,houseInfo.house);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	ground.num_verts = 108;
+	/*ground.num_verts = 108;
 	ground.shape = 0;
-	ground.transform = Translate(0.0f, -2.0f, 0.0f)*Scale(500.0f, 0.1f, 500.0f);
+	ground.transform = Translate(0.0f, -2.0f, 0.0f)*Scale(500.0f, 0.1f, 500.0f);*/
 
 
   glClearDepth( 1.0 ); 
@@ -269,7 +280,7 @@ void display()
   invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
   normalMatrix =  RotateX( xrot ) * RotateY( yrot ) * invScaleTranformation;
   //modelViewObject = Translate(0.0, 0.0, 5.0)*RotateX( xrot ) * RotateY( yrot )*scaleTransformation;
-  modelViewObject = Translate(0.0, drive, 5.0)*RotateY(180.0)*scaleTransformation;
+  modelViewObject = Translate(0.0, 0.0, drive)*RotateY(180.0)*scaleTransformation;
   glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glmDrawVBO(models[0], program[0]);
@@ -284,15 +295,23 @@ void display()
   invScaleTranformation = Scale(1/scale_x, 1/scale_y, 1/scale_z);
   normalMatrix = invScaleTranformation;
   glUniformMatrix4fv(NormalTransformation , 1, GL_TRUE,  normalMatrix);
-  modelViewObject = Translate(-5, 0, -3)*scaleTransformation; 
+  modelViewObject = Translate(-5, 0, -100)*scaleTransformation; 
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glmDrawVBO(models[1], program[0]);
 
-  modelViewObject = Translate(-3, 0, -3)*scaleTransformation;
+  modelViewObject = Translate(-3, 0, -105)*scaleTransformation;
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glmDrawVBO(models[1], program[0]);
 
-  modelViewObject = Translate(-2, 0, -5)*scaleTransformation;
+  modelViewObject = Translate(-2, 0, -100)*scaleTransformation;
+  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
+  glmDrawVBO(models[1], program[0]);
+
+  modelViewObject = Translate(5, 0, -100)*scaleTransformation;
+  glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
+  glmDrawVBO(models[1], program[0]);
+
+  modelViewObject = Translate(7, 0, -98)*scaleTransformation;
   glUniformMatrix4fv( ModelViewObj, 1, GL_TRUE, modelViewObject );
   glmDrawVBO(models[1], program[0]);
 
@@ -340,21 +359,26 @@ void keyboard(unsigned char key, int x, int y)
 		case 'v':
 			if(!heliCam)
 			{
-				pitch(1.0);
 				eye += ROTATE * n * 100;
+				pitch(-0.5);
+				eye -= 20 * ROTATE * n;
+				pitch(0.5);
 				heliCam = true;
 			}
 			break;
 		case 'V':
 			if(heliCam)
 			{
+				pitch(-0.5);
+				eye += 20 * ROTATE * n;
+				pitch(0.5);
 				eye -= ROTATE * n * 100;
-				pitch(-1.0);
+				//pitch(-1.0);
 				heliCam = false;
 			}
 			break;
 		//debugging cases
-		/*
+		
 		case 'Z':
 			roll(ROTATE);
 			break;
@@ -390,7 +414,7 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 		case 'U':
 			eye.z += 5.0;
-			break;*/
+			break;
 	}
 	glutPostRedisplay();
 }
@@ -402,12 +426,14 @@ void arrow(int key, int x, int y)
 		
 		case GLUT_KEY_UP:
 			eye -= ROTATE * n;
-			drive += 1.0;
+			drive -= 0.1;
 			upPressed = true;
 			break;
 		//camera debugging cases
 		case GLUT_KEY_DOWN:
 			eye += ROTATE * n;
+			drive += 0.1;
+			downPressed = true;
 			break;
 		case GLUT_KEY_LEFT:
 			eye -= ROTATE * u;
@@ -426,6 +452,9 @@ void arrowUp(int key, int x, int y)
 		case GLUT_KEY_UP:
 			upPressed = false;
 			break;
+		case GLUT_KEY_DOWN:
+			downPressed = false;
+			break;
 	}
 }
 void reshape( int width, int height )
@@ -441,8 +470,13 @@ void idle()
 {
 	if (upPressed)
 	{
-		drive += 1.0;
+		drive -= 0.1;
 		eye -= ROTATE * n;
+	}
+	if (downPressed)
+	{
+		drive += 0.1;
+		eye += ROTATE *n;
 	}
 	glutPostRedisplay();
 }

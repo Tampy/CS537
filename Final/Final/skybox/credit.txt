@@ -1,1 +1,6 @@
-http://www.brusheezy.com/textures/20185-seamless-green-grass-textures
+Source for grass: http://www.brusheezy.com/textures/20185-seamless-green-grass-textures
+Source for sky: Moodle
+
+The skybox textures were taken from their respective sources. They were used as the
+textures for the skybox in the program. The grass forms the bottom face of the skybox
+cube, while the sky is used for the other faces.

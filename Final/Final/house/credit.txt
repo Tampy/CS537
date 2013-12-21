@@ -1,1 +1,13 @@
-http://tf3dm.com/3d-model/house-48545.html
+Source: http://tf3dm.com/3d-model/house-48545.html
+
+This model was found by searching tf3dm, which I knew about since I had found the car
+model on the same site. I  searched for a simple house that looked like it belonged in
+a village.
+
+THe model was used as the village the car drives up to. The model was imported using
+GLM as the car was. I created multiple houses bycalling for the house multiple times, 
+each time translating the house to a different location. This created a small village 
+of identical houses.
+
+The texture of the house came with the model as a DDS. I converted it to PPM using
+Paint.NET.

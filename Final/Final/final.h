@@ -52,15 +52,13 @@ GLuint vNormal;
 int winHeight = 480;
 int winWidth = 640;
 
-bool upPressed = false;
-
 float xrot = -20;
 float yrot = 0;
 float xdiff = 0;
 float ydiff = 0;
 
 GLfloat step = 5;
-GLfloat drive = 0.0;
+GLfloat drive = 5.0;
 // Camera Coordianate System
 vec4 u = vec4(1, 0, 0, 0);
 vec4 v = vec4(0, 1, 0, 0);
@@ -69,6 +67,8 @@ vec4 eye = vec4(0,2,10,1);
 
 //checks if we're in helicopter or car camera
 bool heliCam;
+bool upPressed = false;
+bool downPressed = false;
 
 void roll(GLfloat num);
 void pitch(GLfloat num);
@@ -79,7 +79,7 @@ void display();
 void displaySkybox();
 void keyboard(unsigned char key, int x, int y);
 void arrow(int key, int x, int y);
-void arrowUp(int key, int x, int y)
+void arrowUp(int key, int x, int y);
 void reshape(GLint w, GLint h);
 void idle();
 int main(int argc, char** argv);
@@ -159,6 +159,7 @@ public:
 };
 //car struc
 GLuint carTexture[2];
+GLuint houseTexture;
 
 
 typedef struct
@@ -173,6 +174,15 @@ typedef struct
 }	carMap;
 
 carMap car;
+
+typedef struct
+{
+	int houseWidth;
+	int houseHeight;
+	GLubyte *house;
+}	houseMap;
+houseMap houseInfo;
+
 //Skybox struc
 GLuint texture;
 typedef struct
@@ -217,7 +227,7 @@ mat4 model_view = Angel::mat4(1.0);
 
 mat4 modelviewStackTop = mat4(1.0);
 mat4 modelviewStackBottom=  mat4(1.0);
-
+/*
 typedef struct{
 	//material mat;
 	mat4 transform;
@@ -225,7 +235,7 @@ typedef struct{
 	int shape;
 } createdModel;
 
-createdModel ground;
+createdModel ground;*/
 
 typedef struct{
 	mat4 translation;

@@ -1,1 +1,12 @@
-http://tf3dm.com/3d-model/old-car-80440.html
+Source: http://tf3dm.com/3d-model/old-car-80440.html
+
+The model was found by trying to search for sites online that provide free .obj models.
+Finding tf3dm.com, I simply searched for a simple car model. I settled on this one
+because other car models were too complex and crashed the program.
+
+This model was incorporated into the scene as the car the user drives. It is
+imported via GLM and placed in a position (by rotating it 180) where it is facing
+the village.
+
+The texture of the car came with the model as a DDS. I converted it to PPM using
+Paint.NET.
